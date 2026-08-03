@@ -1,0 +1,17 @@
+{
+  "FolderOrderSettings":[
+    {"name":"Sprites","order":9,"path":"folders/Sprites.yy",},
+  ],
+  "ResourceOrderSettings":[
+    {"name":"spr_fish","order":9,"path":"sprites/spr_fish/spr_fish.yy",},
+    {"name":"spr_hangibasket","order":1,"path":"sprites/spr_hangibasket/spr_hangibasket.yy",},
+    {"name":"spr_heart_full","order":2,"path":"sprites/spr_heart_full/spr_heart_full.yy",},
+    {"name":"spr_player_dead","order":3,"path":"sprites/spr_player_dead/spr_player_dead.yy",},
+    {"name":"spr_player_idle","order":4,"path":"sprites/spr_player_idle/spr_player_idle.yy",},
+    {"name":"spr_player_jump","order":5,"path":"sprites/spr_player_jump/spr_player_jump.yy",},
+    {"name":"spr_player_run","order":6,"path":"sprites/spr_player_run/spr_player_run.yy",},
+    {"name":"spr_rat","order":8,"path":"sprites/spr_rat/spr_rat.yy",},
+    {"name":"spr_spike","order":7,"path":"sprites/spr_spike/spr_spike.yy",},
+    {"name":"spr_star","order":10,"path":"sprites/spr_star/spr_star.yy",},
+  ],
+}
