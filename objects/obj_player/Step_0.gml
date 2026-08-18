@@ -1,9 +1,5 @@
-// Get Player Input
-key_left = keyboard_check(vk_left) or keyboard_check(ord("A"));
-key_right = keyboard_check(vk_right) or keyboard_check(ord("D"));
-key_jump = keyboard_check_pressed(vk_space) or keyboard_check_pressed(vk_up) or keyboard_check_pressed(ord("W"));
-
-
+//Player movement
+getControls();
 	
 
 //Calculate Movement
@@ -13,9 +9,12 @@ hsp = move * walksp;
 
 vsp = vsp + grv;
 
-if (place_meeting(x,y+1,obj_ground)) && (key_jump)
+if (place_meeting(x,y+1,obj_ground)) && (jump_key_buffered)
 {
-	vsp = -5;
+	//Reset the buffer
+	jump_key_buffered = false;
+	jump_key_buffer_timer = 0;	
+	vsp = -4.5;
 
 }
 
@@ -31,6 +30,10 @@ if (place_meeting(x+hsp,y,obj_ground))
 x = x + hsp;
 
 //Vertical Collision
+//cap falling speed
+if vsp > term_vel {vsp = term_vel; };
+
+//Collision
 if (place_meeting(x,y+vsp,obj_ground))
 {
 	while (!place_meeting(x,y+sign(vsp),obj_ground))
