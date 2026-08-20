@@ -8,7 +8,6 @@
   ],
   "ResourceOrderSettings":[
     {"name":"obj_ground","order":1,"path":"objects/obj_ground/obj_ground.yy",},
-    {"name":"scr_general_functions","order":14,"path":"scripts/scr_general_functions/scr_general_functions.yy",},
     {"name":"spr_cave_block","order":13,"path":"sprites/spr_cave_block/spr_cave_block.yy",},
     {"name":"spr_dirt","order":12,"path":"sprites/spr_dirt/spr_dirt.yy",},
     {"name":"spr_fish","order":9,"path":"sprites/spr_fish/spr_fish.yy",},
