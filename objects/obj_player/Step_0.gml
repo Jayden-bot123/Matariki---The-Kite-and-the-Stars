@@ -7,17 +7,33 @@ var move = key_right - key_left;
 
 hsp = move * walksp;
 
-vsp = vsp + grv;
+//Gravity
+if coyote_hang_timer > 0
+{
+	//Count the timer down
+	coyote_hang_timer--;
+}
+else
+{
+	//Apply gravity to the player
+	vsp += grv;
+	//We're no longer on the ground
+	setOnGround(false);
+}
+
 
 //reset/prreparing jumping variables
 if on_ground
 {
 	jump_count = 0;
+	coyote_jump_timer = coyote_jump_frames;
 }
 else
 {
 	//If the player is in the air, make sure they can't do an extra jump
-	if jump_count ==0 {jump_count = 1; };
+	coyote_jump_timer--;
+	
+	if jump_count ==0 && coyote_jump_timer <= 0 {jump_count = 1; };
 }
 
 //Initiate the Jump
@@ -32,6 +48,9 @@ if (jump_key_buffered) && jump_count < jump_max
 	
 	//set the jump hold timer
 	jump_hold_timer = jump_hold_frames;
+	//Tell ourself we are no longer on the ground
+	setOnGround(false);
+	coyote_jump_timer = 0;
 
 }
 //Cut off the jump by releasing the jump button
@@ -84,12 +103,9 @@ y = y + vsp;
 //Set if I'm on the ground 
 if vsp >= 0 && (place_meeting(x,y+1,obj_ground)) 
 {
-	on_ground = true;
+	setOnGround(true);
 }
-else
-{
-	on_ground = false;
-}
+
 
 
 // Set sprite based on state

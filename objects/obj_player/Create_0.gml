@@ -1,4 +1,17 @@
-//control setup
+//Custom functions for player
+function setOnGround(_val = true)
+{
+	if _val == true
+	{
+		on_ground = true;
+		coyote_hang_timer = coyote_hang_frames;
+		
+	} else {
+		on_ground = false;
+		coyote_hang_timer = 0;
+	}
+}
+//Control Setup
 controlsStepup();
 
 //horizontal speed of the player
