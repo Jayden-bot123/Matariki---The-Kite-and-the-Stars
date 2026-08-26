@@ -34,6 +34,8 @@ jump_count = 0;
 jump_hold_timer = 0;
 jump_hold_frames = 7.5;
 
+frozen = false;
+
 
 //Coyote Time
 //Hang time
@@ -42,3 +44,11 @@ coyote_hang_timer = 0;
 //Jump buffer time
 coyote_jump_frames = 5;
 coyote_jump_timer = 0;
+
+// Hearts and damage
+hp = 3;
+max_hp = 3;
+invincible = false;
+inv_timer = 0;
+inv_duration = 90;
+flash_timer = 0;

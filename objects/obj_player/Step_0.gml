@@ -1,3 +1,10 @@
+// If frozen stop all movement
+if frozen { 
+    hsp = 0;
+    vsp = 0;
+    exit; // skip rest of step event
+}
+
 //Player movement
 getControls();
 	
@@ -143,6 +150,43 @@ if !place_meeting(x, y+1, obj_ground)
 // Face direction
 if hsp > 0 { face = 1; }
 if hsp < 0 { face = -1; }
+
+// Invincibility frames after taking damage
+if invincible
+{
+    inv_timer--;
+    flash_timer++;
+    
+    // Flash between visible and transparent
+    if flash_timer mod 6 < 3
+    {
+        image_alpha = 0.3;
+    }
+    else
+    {
+        image_alpha = 1;
+    }
+    
+    // End invincibility
+    if inv_timer <= 0
+    {
+        invincible = false;
+        image_alpha = 1;
+        flash_timer = 0;
+    }
+}
+
+// Restart level if no lives left
+if hp <= 0
+{
+    room_restart();
+}
+
+// TEMP — press T to test taking damage, remove later
+if keyboard_check_pressed(ord("T"))
+{
+    take_damage();
+}
 
 // Set collision mask to idle sprite so hitbox stays consistent
 mask_index = spr_player_idle;
