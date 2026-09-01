@@ -11,8 +11,8 @@ if show_description {
     // Phase 1 — star image slides up from bottom
     if phase == 1 {
         star_anim_y -= 4;
-        if star_anim_y <= display_get_gui_height()/2 - 40 {
-            star_anim_y = display_get_gui_height()/2 - 40;
+        if star_anim_y <= display_get_gui_height()/2 - 120 {
+            star_anim_y = display_get_gui_height()/2 - 120;
             phase = 2;
         }
     }

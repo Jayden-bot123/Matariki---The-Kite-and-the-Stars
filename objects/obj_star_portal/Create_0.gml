@@ -1,4 +1,4 @@
-star_number = 1;
+
 show_description = false;
 description_timer = 180;
 skip_alpha = 0;

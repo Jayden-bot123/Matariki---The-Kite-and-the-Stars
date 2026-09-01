@@ -48,6 +48,11 @@ coyote_jump_timer = 0;
 // Hearts and damage
 hp = 3;
 max_hp = 3;
+// Knockback variables
+knockback_hsp = 0;
+knockback_timer = 0;
+
+// Invincibility
 invincible = false;
 inv_timer = 0;
 inv_duration = 90;

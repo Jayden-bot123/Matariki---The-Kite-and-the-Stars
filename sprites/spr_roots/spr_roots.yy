@@ -24,7 +24,7 @@
   ],
   "name":"spr_roots",
   "nineSlice":null,
-  "origin":7,
+  "origin":1,
   "parent":{
     "name":"Sprites",
     "path":"folders/Sprites.yy",
@@ -82,7 +82,7 @@
     "visibleRange":null,
     "volume":1.0,
     "xorigin":8,
-    "yorigin":10,
+    "yorigin":0,
   },
   "swatchColours":null,
   "swfPrecision":0.5,

@@ -2,9 +2,9 @@
   "$GMSprite":"v2",
   "%Name":"spr_hangi_basket_display",
   "bboxMode":0,
-  "bbox_bottom":11,
+  "bbox_bottom":23,
   "bbox_left":0,
-  "bbox_right":11,
+  "bbox_right":23,
   "bbox_top":0,
   "collisionKind":1,
   "collisionTolerance":0,
@@ -16,7 +16,7 @@
   ],
   "gridX":0,
   "gridY":0,
-  "height":12,
+  "height":24,
   "HTile":false,
   "layers":[
     {"$GMImageLayer":"","%Name":"a652e7a4-9579-4f8a-b27a-cfbb440c97f0","blendMode":0,"displayName":"default","isLocked":false,"name":"a652e7a4-9579-4f8a-b27a-cfbb440c97f0","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
@@ -86,5 +86,5 @@
   },
   "type":0,
   "VTile":false,
-  "width":12,
+  "width":24,
 }

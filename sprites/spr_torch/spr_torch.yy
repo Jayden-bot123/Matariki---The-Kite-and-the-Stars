@@ -23,7 +23,7 @@
   ],
   "name":"spr_torch",
   "nineSlice":null,
-  "origin":4,
+  "origin":7,
   "parent":{
     "name":"Sprites",
     "path":"folders/Sprites.yy",
@@ -76,7 +76,7 @@
     "visibleRange":null,
     "volume":1.0,
     "xorigin":4,
-    "yorigin":9,
+    "yorigin":18,
   },
   "swatchColours":null,
   "swfPrecision":0.5,
