@@ -33,6 +33,7 @@
     {"id":{"name":"obj_cloud_fake","path":"objects/obj_cloud_fake/obj_cloud_fake.yy",},},
     {"id":{"name":"obj_cloud","path":"objects/obj_cloud/obj_cloud.yy",},},
     {"id":{"name":"obj_dirt","path":"objects/obj_dirt/obj_dirt.yy",},},
+    {"id":{"name":"obj_fish","path":"objects/obj_fish/obj_fish.yy",},},
     {"id":{"name":"obj_flower_platform","path":"objects/obj_flower_platform/obj_flower_platform.yy",},},
     {"id":{"name":"obj_flower","path":"objects/obj_flower/obj_flower.yy",},},
     {"id":{"name":"obj_game_controller","path":"objects/obj_game_controller/obj_game_controller.yy",},},

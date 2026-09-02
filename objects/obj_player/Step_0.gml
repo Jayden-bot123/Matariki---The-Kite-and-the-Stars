@@ -66,9 +66,8 @@ if jump_hold_timer > 0 {
 }
 
 
-// -------------------------------------------------
+
 // HORIZONTAL COLLISION
-// -------------------------------------------------
 
 if place_meeting(x + hsp, y, obj_ground) ||
    (invincible && place_meeting(x + hsp, y, obj_water))
@@ -85,18 +84,16 @@ if place_meeting(x + hsp, y, obj_ground) ||
 x += hsp;
 
 
-// -------------------------------------------------
 // CAP FALL SPEED
-// -------------------------------------------------
+
 
 if vsp > term_vel {
     vsp = term_vel;
 }
 
 
-// -------------------------------------------------
 // VERTICAL COLLISION
-// -------------------------------------------------
+
 
 if place_meeting(x, y + vsp, obj_ground) ||
    (invincible && place_meeting(x, y + vsp, obj_water))
@@ -116,9 +113,9 @@ if place_meeting(x, y + vsp, obj_ground) ||
 
 y += vsp;
 
-// -------------------------------------------------
+
 // SET ON GROUND
-// -------------------------------------------------
+
 
 if vsp >= 0 &&
    (
@@ -130,9 +127,9 @@ if vsp >= 0 &&
 }
 
 
-// -------------------------------------------------
+
 // SPRITE CONTROL
-// -------------------------------------------------
+
 
 if hsp != 0 {
     sprite_index = spr_player_run;
@@ -160,9 +157,9 @@ if !place_meeting(x, y + 1, obj_ground) &&
 }
 
 
-// -------------------------------------------------
+
 // FACE DIRECTION
-// -------------------------------------------------
+
 
 if knockback_timer <= 0 {
     if hsp > 0 {
@@ -175,9 +172,75 @@ if knockback_timer <= 0 {
 }
 
 
-// -------------------------------------------------
+// WATER DAMAGE
+
+if !invincible
+{
+    // Check for water at the player's feet
+    var water_touch = collision_rectangle(
+        bbox_left,
+        bbox_bottom - 1,
+        bbox_right,
+        bbox_bottom + 1,
+        obj_water,
+        false,
+        true
+    );
+
+    if water_touch != noone
+    {
+        // Check how much of the player's feet are supported
+        // by the lily pad.
+
+        var pad_left = collision_point(
+            bbox_left + 1,
+            bbox_bottom + 1,
+            obj_lilypad,
+            false,
+            true
+        );
+
+        var pad_middle = collision_point(
+            x,
+            bbox_bottom + 1,
+            obj_lilypad,
+            false,
+            true
+        );
+
+        var pad_right = collision_point(
+            bbox_right - 1,
+            bbox_bottom + 1,
+            obj_lilypad,
+            false,
+            true
+        );
+
+        // Count how many parts of the player's feet
+        // are actually supported by the lily pad.
+        var pad_support = 0;
+
+        if pad_left != noone {
+            pad_support++;
+        }
+
+        if pad_middle != noone {
+            pad_support++;
+        }
+
+        if pad_right != noone {
+            pad_support++;
+        }
+
+        // Only stay safe if ALL three points are supported.
+        if pad_support < 3
+        {
+            take_damage(-face);
+        }
+    }
+}
 // INVINCIBILITY
-// -------------------------------------------------
+
 
 if invincible {
 
@@ -199,17 +262,20 @@ if invincible {
 }
 
 
-// -------------------------------------------------
+
 // RESTART IF NO HP
-// -------------------------------------------------
+
 
 if hp <= 0 {
     room_restart();
 }
 
 
-// -------------------------------------------------
 // LOCK COLLISION MASK
-// -------------------------------------------------
+
 
 mask_index = spr_player_idle;
+
+
+
+
