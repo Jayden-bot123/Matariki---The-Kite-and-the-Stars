@@ -57,3 +57,5 @@ invincible = false;
 inv_timer = 0;
 inv_duration = 90;
 flash_timer = 0;
+
+hascontrol = true;

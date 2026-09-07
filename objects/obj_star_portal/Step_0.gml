@@ -36,11 +36,10 @@ if show_description {
     }
     
     // Skip when enter pressed and button is visible
-    if skip_alpha > 0 && keyboard_check_pressed(vk_enter) {
-        // Unfreeze player
-        with obj_player {
-            frozen = false;
-        }
-        room_goto_next();
-    }
+	if skip_alpha > 0 && keyboard_check_pressed(vk_enter) {
+	    with obj_player {
+	        frozen = false;
+	    }
+	    scr_slide_transition(TRANS_MODE.NEXT);
+	}
 }

@@ -1,3 +1,5 @@
+
+
 // If frozen stop all movement
 if frozen {
     hsp = 0;
@@ -5,10 +7,17 @@ if frozen {
     exit;
 }
 
-
-// Get controls
-getControls();
-
+if (hascontrol)
+{
+	// Get controls
+	getControls();
+}
+else
+{
+	key_right = 0;
+	key_left = 0;
+	key_jump = 0;
+}
 
 // Apply knockback if active
 if knockback_timer > 0 {
@@ -267,8 +276,9 @@ if invincible {
 
 
 if hp <= 0 {
-    room_restart();
+	room_restart();
 }
+
 
 
 // LOCK COLLISION MASK
