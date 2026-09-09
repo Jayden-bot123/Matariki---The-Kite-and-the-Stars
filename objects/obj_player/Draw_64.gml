@@ -8,21 +8,24 @@ for (var i = 0; i < max_hp; i++)
 }
 
 // Draw hangi counter (top right)
-// Position calculation — sits in top right corner
+
 var hud_x = display_get_gui_width() - 96;
 var hud_y = 10;
 
 // Draw hangi basket icon
 draw_sprite(spr_hangi_basket_display, 0, hud_x, hud_y);
 
-// Draw x symbol
+// Draw hangi number
 draw_set_font(f_hangi);
+draw_set_halign(fa_left);
+draw_set_valign(fa_middle);
 
 var hangi_text = "x " + string(global.hangi_total);
-var text_x = hud_x + 30;
-var text_y = hud_y;
 
-// Draw black outline
+var text_x = hud_x + 30;
+var text_y = hud_y + 16;
+
+// Black outline
 draw_set_color(c_black);
 
 for (var ox = -1; ox <= 1; ox++)
@@ -36,6 +39,11 @@ for (var ox = -1; ox <= 1; ox++)
     }
 }
 
-// Draw white text on top
+// White text
 draw_set_color(c_white);
 draw_text(text_x, text_y, hangi_text);
+
+// Reset
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);
+draw_set_color(c_white);
