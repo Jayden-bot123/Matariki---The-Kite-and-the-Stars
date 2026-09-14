@@ -1,6 +1,5 @@
-// -------------------------------------------------
 // PLAYER JUMPS ON RAT
-// -------------------------------------------------
+
 
 if !other.invincible
 && other.vsp > 0
@@ -17,12 +16,12 @@ if !other.invincible
 }
 else
 {
-    // -------------------------------------------------
     // RAT HITS PLAYER
-    // -------------------------------------------------
+
 
     if !other.invincible
     {
+
         var knockback_dir = sign(other.x - x);
 
         with (other)

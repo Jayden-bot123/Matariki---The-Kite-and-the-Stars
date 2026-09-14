@@ -59,3 +59,25 @@ inv_duration = 90;
 flash_timer = 0;
 
 hascontrol = true;
+
+// GAME OVER / DEATH
+
+dying = false;
+death_on_ground = false;
+
+gameover_alpha = 0;
+gameover_button_alpha = 0;
+
+gameover_button_delay = 60; // 1 second before buttons appear
+
+gameover_cursor = 0;
+
+// 0 = Restart
+// 1 = Main Menu
+// 2 = Quit
+
+gameover_control = false;
+
+gameover_selected = false;
+
+death_frame = 0;
