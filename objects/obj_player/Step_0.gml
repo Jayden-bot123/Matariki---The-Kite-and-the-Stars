@@ -1,3 +1,119 @@
+// PAUSE SYSTEM
+
+if !dying
+{
+    // Press ESC to pause / unpause
+    if keyboard_check_pressed(vk_escape)
+    {
+        global.paused = !global.paused;
+
+        if global.paused
+        {
+            // Reset pause screen
+            pause_alpha = 0;
+            pause_button_alpha = 0;
+            pause_button_delay = 20;
+            pause_cursor = 0;
+            pause_selected = false;
+
+            // Stop player movement
+            hsp = 0;
+            vsp = 0;
+        }
+    }
+}
+
+
+// PAUSED
+
+if global.paused
+{
+    // Keep player completely still
+    hsp = 0;
+    vsp = 0;
+
+    // Fade in pause screen
+    if pause_alpha < 0.85
+    {
+        pause_alpha += 0.02;
+    }
+
+    // Wait before showing buttons
+    if pause_alpha >= 0.85
+    {
+        if pause_button_delay > 0
+        {
+            pause_button_delay--;
+        }
+        else
+        {
+            pause_button_alpha += 0.03;
+
+            if pause_button_alpha >= 1
+            {
+                pause_button_alpha = 1;
+            }
+        }
+    }
+
+    // PAUSE MENU CONTROLS
+
+    if pause_button_alpha >= 1
+    {
+        if keyboard_check_pressed(vk_up)
+        {
+            pause_cursor--;
+
+            if pause_cursor < 0
+            {
+                pause_cursor = 2;
+            }
+        }
+
+        if keyboard_check_pressed(vk_down)
+        {
+            pause_cursor++;
+
+            if pause_cursor > 2
+            {
+                pause_cursor = 0;
+            }
+        }
+
+        if keyboard_check_pressed(vk_enter)
+        {
+            pause_selected = true;
+
+            switch (pause_cursor)
+            {
+                // RESUME
+                case 0:
+                {
+                    global.paused = false;
+                    break;
+                }
+
+                // RESTART
+                case 1:
+                {
+                    scr_slide_transition(TRANS_MODE.RESTART);
+                    break;
+                }
+
+                // MAIN MENU
+                case 2:
+                {
+                    scr_slide_transition(TRANS_MODE.GOTO, rm_main_menu);
+                    break;
+                }
+            }
+        }
+    }
+
+    exit;
+}
+
+
 // GAME OVER DEATH SEQUENCE
 
 if dying
@@ -39,6 +155,7 @@ if dying
         }
 
         // GAME OVER keyboard controls
+
         if gameover_control
         {
             if keyboard_check_pressed(vk_up)
@@ -117,7 +234,6 @@ else
     key_jump = 0;
 }
 
-
 // APPLY KNOCKBACK
 
 if knockback_timer > 0
@@ -127,11 +243,50 @@ if knockback_timer > 0
 }
 else
 {
-    // Normal horizontal movement
     var move = key_right - key_left;
-    hsp = move * walksp;
-}
 
+    // Check ONLY for slippery ground
+    var on_slippery = place_meeting(
+        x,
+        y + 1,
+        obj_ground_slippery
+    );
+
+    if on_ground && on_slippery
+    {
+        // OILED / VERY SLIPPERY GROUND
+
+        var slippery_acceleration = 0.35;
+        var slippery_friction = 0.985;
+
+        // Accelerate towards the direction being pressed
+        if move != 0
+        {
+            hsp += move * slippery_acceleration;
+
+            // Keep slippery running speed reasonable
+            hsp = clamp(hsp, -walksp, walksp);
+        }
+        else
+        {
+            // Slowly lose momentum when no direction is pressed
+            hsp *= slippery_friction;
+
+            // Stop tiny leftover movement
+            if abs(hsp) < 0.05
+            {
+                hsp = 0;
+            }
+        }
+    }
+    else
+    {
+        // ORIGINAL MOVEMENT
+        // This handles ALL normal ground and ALL airborne movement.
+
+        hsp = move * walksp;
+    }
+}
 
 // GRAVITY
 
@@ -172,6 +327,28 @@ if jump_key_buffered && jump_count < jump_max
     jump_key_buffer_timer = 0;
     jump_count++;
     jump_hold_timer = jump_hold_frames;
+
+    // Remember whether the player was moving when
+    // they jumped from slippery ground.
+    if place_meeting(x, y + 1, obj_ground_slippery)
+    {
+        slip_jump_active = true;
+
+        if abs(hsp) > 0.1
+        {
+            slip_jump_moving = true;
+        }
+        else
+        {
+            slip_jump_moving = false;
+        }
+    }
+    else
+    {
+        slip_jump_active = false;
+        slip_jump_moving = false;
+    }
+
     setOnGround(false);
     coyote_jump_timer = 0;
 }
@@ -197,10 +374,11 @@ if jump_hold_timer > 0
 // HORIZONTAL COLLISION
 
 if place_meeting(x + hsp, y, obj_ground) ||
-   (invincible && place_meeting(x + hsp, y, obj_water))
+   ((invincible || dying) && place_meeting(x + hsp, y, obj_water))
 {
     while !place_meeting(x + sign(hsp), y, obj_ground) &&
-          !(invincible && place_meeting(x + sign(hsp), y, obj_water))
+          !((invincible || dying) &&
+            place_meeting(x + sign(hsp), y, obj_water))
     {
         x += sign(hsp);
     }
@@ -221,14 +399,104 @@ if vsp > term_vel
 
 // VERTICAL COLLISION
 
+var ground_collision = place_meeting(
+    x,
+    y + vsp,
+    obj_ground
+);
 
-if place_meeting(x, y + vsp, obj_ground) ||
-   (invincible && place_meeting(x, y + vsp, obj_water)) ||
-   (dying && place_meeting(x, y + vsp, obj_water))
+var water_collision =
+    (invincible || dying) &&
+    place_meeting(
+        x,
+        y + vsp,
+        obj_water
+    );
+
+
+// ONE-WAY PLATFORM COLLISION
+
+var oneway_landed = false;
+
+if vsp > 0
 {
-    while !place_meeting(x, y + sign(vsp), obj_ground) &&
-          !(invincible && place_meeting(x, y + sign(vsp), obj_water)) &&
-          !(dying && place_meeting(x, y + sign(vsp), obj_water))
+    // Player's feet before moving
+    var previous_bottom = bbox_bottom;
+
+    // Player's feet after moving
+    var next_bottom = bbox_bottom + vsp;
+
+    var platform_list = ds_list_create();
+
+    var platform_count = collision_rectangle_list(
+        bbox_left,
+        bbox_top,
+        bbox_right,
+        next_bottom + 1,
+        obj_platform,
+        false,
+        true,
+        platform_list,
+        false
+    );
+
+    var landing_platform = noone;
+    var landing_top = 1000000;
+
+    for (var i = 0; i < platform_count; i++)
+    {
+        var platform = platform_list[| i];
+
+        // Only land if the player's feet cross the platform top
+
+        if previous_bottom <= platform.bbox_top &&
+           next_bottom >= platform.bbox_top
+        {
+            // Make sure the player is horizontally over the platform
+
+            if bbox_right > platform.bbox_left &&
+               bbox_left < platform.bbox_right
+            {
+                if platform.bbox_top < landing_top
+                {
+                    landing_top = platform.bbox_top;
+                    landing_platform = platform;
+                }
+            }
+        }
+    }
+
+    ds_list_destroy(platform_list);
+
+    // Land on the platform
+
+    if landing_platform != noone
+    {
+        y += landing_platform.bbox_top - bbox_bottom;
+
+        vsp = 0;
+        oneway_landed = true;
+    }
+}
+
+
+// NORMAL GROUND / WATER COLLISION
+
+if !oneway_landed &&
+   (ground_collision || water_collision)
+{
+    while !place_meeting(
+        x,
+        y + sign(vsp),
+        obj_ground
+    )
+    &&
+    !((invincible || dying) &&
+      place_meeting(
+          x,
+          y + sign(vsp),
+          obj_water
+      ))
     {
         y += sign(vsp);
     }
@@ -241,21 +509,60 @@ if place_meeting(x, y + vsp, obj_ground) ||
     vsp = 0;
 }
 
-y += vsp;
+
+// Move vertically if we didn't land on a one-way platform
+
+if !oneway_landed
+{
+    y += vsp;
+}
+
+
+// CHECK IF PLAYER IS STANDING ON A ONE-WAY PLATFORM
+
+var standing_on_oneway = false;
+
+var standing_platform_list = ds_list_create();
+
+var standing_platform_count = collision_rectangle_list(
+    bbox_left,
+    bbox_bottom,
+    bbox_right,
+    bbox_bottom + 1,
+    obj_platform,
+    false,
+    true,
+    standing_platform_list,
+    false
+);
+
+for (var j = 0; j < standing_platform_count; j++)
+{
+    var standing_platform = standing_platform_list[| j];
+
+    if abs(standing_platform.bbox_top - bbox_bottom) <= 1
+    {
+        standing_on_oneway = true;
+        break;
+    }
+}
+
+ds_list_destroy(standing_platform_list);
 
 
 // SET ON GROUND
 
-if vsp >= 0 &&
+if standing_on_oneway ||
    (
-       place_meeting(x, y + 1, obj_ground) ||
-       (invincible && place_meeting(x, y + 1, obj_water)) ||
-       (dying && place_meeting(x, y + 1, obj_water))
+       vsp >= 0 &&
+       (
+           place_meeting(x, y + 1, obj_ground) ||
+           (invincible && place_meeting(x, y + 1, obj_water))
+       )
    )
 {
     setOnGround(true);
 
-    // Death player has landed
     if dying && !death_on_ground
     {
         death_on_ground = true;
@@ -267,6 +574,28 @@ if vsp >= 0 &&
         image_speed = 0;
         image_index = death_frame;
     }
+}
+
+// SLIPPERY LANDING
+
+if slip_jump_active &&
+   standing_on_oneway == false &&
+   place_meeting(x, y + 1, obj_ground_slippery)
+{
+    // Small slide if the player jumped while stationary
+    // Medium slide if the player jumped while moving
+
+    if slip_jump_moving
+    {
+        hsp = face * 1.5;
+    }
+    else
+    {
+        hsp = face * 0.7;
+    }
+
+    slip_jump_active = false;
+    slip_jump_moving = false;
 }
 
 
@@ -286,7 +615,9 @@ if !dying
     }
 
     // Check if player is in the air
-    if !place_meeting(x, y + 1, obj_ground) &&
+
+    if !standing_on_oneway &&
+       !place_meeting(x, y + 1, obj_ground) &&
        !(invincible && place_meeting(x, y + 1, obj_water))
     {
         sprite_index = spr_player_jump;
@@ -305,6 +636,7 @@ if !dying
 else if death_on_ground
 {
     // Keep death sprite active
+
     sprite_index = spr_player_death;
     image_speed = 0;
     image_index = death_frame;
@@ -329,9 +661,10 @@ if knockback_timer <= 0 && !dying
 
 // WATER DAMAGE
 
-if !invincible
+if !invincible && !dying
 {
     // Check for water at the player's feet
+
     var water_touch = collision_rectangle(
         bbox_left,
         bbox_bottom - 1,
@@ -345,7 +678,7 @@ if !invincible
     if water_touch != noone
     {
         // Check how much of the player's feet
-        // are supported by the lily pad.
+        // are supported by the lily pad
 
         var pad_left = collision_point(
             bbox_left + 1,
@@ -390,7 +723,7 @@ if !invincible
             pad_support++;
         }
 
-        // Only stay safe if ALL three points are supported.
+        // Only stay safe if ALL three points are supported
 
         if pad_support < 3
         {
@@ -428,4 +761,3 @@ if invincible
 // LOCK COLLISION MASK
 
 mask_index = spr_player_idle;
-

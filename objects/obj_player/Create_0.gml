@@ -32,7 +32,7 @@ on_ground = true;
 jump_max = 1;
 jump_count = 0;
 jump_hold_timer = 0;
-jump_hold_frames = 7.5;
+jump_hold_frames = 8.5;
 
 frozen = false;
 
@@ -81,3 +81,25 @@ gameover_control = false;
 gameover_selected = false;
 
 death_frame = 0;
+
+// PAUSE SYSTEM
+
+global.paused = false;
+
+pause_alpha = 0;
+pause_button_alpha = 0;
+pause_button_delay = 20;
+
+pause_cursor = 0;
+
+// 0 = Resume
+// 1 = Restart
+// 2 = Main Menu
+
+pause_selected = false;
+
+// SLIPPERY GROUND
+
+slip_jump_active = false;
+slip_jump_moving = false;
+

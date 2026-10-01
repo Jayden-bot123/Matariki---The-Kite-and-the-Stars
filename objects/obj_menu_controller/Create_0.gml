@@ -4,7 +4,7 @@ title_alpha = 0;
 title_fade_speed = 0.025;
 
 // Wait 2.5 seconds before fading in
-title_delay = room_speed * 2.5;
+title_delay = room_speed * 1.5;
 
 // Wait until the title has finished fading,
 // then wait another 1.5 seconds before buttons appear.

@@ -1,3 +1,8 @@
+if global.paused
+{
+    exit;
+}
+
 // Bob and rotate animation when portal is active
 if !show_description {
     image_yscale = 1 + sin(current_time * 0.003) * 0.08;

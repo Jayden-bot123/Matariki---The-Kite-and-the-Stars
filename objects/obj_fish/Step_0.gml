@@ -1,3 +1,7 @@
+if variable_global_exists("paused") && global.paused
+{
+    exit;
+}
 if active {
     // Apply gravity
     vsp += grv;

@@ -1,5 +1,5 @@
-// Movement
-hsp = 1;
+ // Movement
+hsp = 0.75;
 vsp = 0;
 
 // Gravity

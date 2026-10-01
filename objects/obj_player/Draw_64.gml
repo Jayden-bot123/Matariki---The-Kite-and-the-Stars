@@ -147,3 +147,100 @@ if dying
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
 }
+
+// PAUSE SCREEN
+
+if global.paused
+{
+
+    // DARK TRANSLUCENT OVERLAY
+
+    draw_set_alpha(pause_alpha);
+    draw_set_color(c_black);
+
+    draw_rectangle(
+        0,
+        0,
+        display_get_gui_width(),
+        display_get_gui_height(),
+        false
+    );
+
+    // PAUSE TITLE
+
+    draw_set_alpha(pause_alpha);
+    draw_set_color(c_white);
+    draw_set_font(f_menu_title);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+
+    draw_text(
+        display_get_gui_width() / 2,
+        75,
+        "PAUSED"
+    );
+
+    // BUTTONS
+
+    if pause_button_alpha > 0
+    {
+        draw_set_alpha(pause_button_alpha);
+        draw_set_font(f_buttons);
+
+        var button_x = display_get_gui_width() / 2;
+
+        var resume_y = 145;
+        var restart_y = 180;
+        var menu_y = 215;
+
+
+        // RESUME
+
+        if pause_cursor == 0
+        {
+            draw_set_color(c_white);
+            draw_text(button_x, resume_y, "> RESUME");
+        }
+        else
+        {
+            draw_set_color(c_gray);
+            draw_text(button_x, resume_y, "RESUME");
+        }
+
+
+        // RESTART
+
+        if pause_cursor == 1
+        {
+            draw_set_color(c_white);
+            draw_text(button_x, restart_y, "> RESTART");
+        }
+        else
+        {
+            draw_set_color(c_gray);
+            draw_text(button_x, restart_y, "RESTART");
+        }
+
+
+        // MAIN MENU
+
+        if pause_cursor == 2
+        {
+            draw_set_color(c_white);
+            draw_text(button_x, menu_y, "> MAIN MENU");
+        }
+        else
+        {
+            draw_set_color(c_gray);
+            draw_text(button_x, menu_y, "MAIN MENU");
+        }
+    }
+
+
+    // Reset drawing settings
+
+    draw_set_alpha(1);
+    draw_set_color(c_white);
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}

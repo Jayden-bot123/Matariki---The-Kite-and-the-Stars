@@ -43,7 +43,7 @@ function take_damage(_knockback_dir = 0)
             // Original knockback
             if _knockback_dir != 0
             {
-                knockback_hsp = _knockback_dir * 2.5;
+                knockback_hsp = _knockback_dir * 2;
                 knockback_timer = 15;
             }
 

@@ -1,3 +1,7 @@
+if global.paused
+{
+    exit;
+}
 // Only animate if portal description is not showing
 var portal = instance_find(obj_star_portal, 0);
 if instance_exists(obj_star_portal) && portal.show_description {

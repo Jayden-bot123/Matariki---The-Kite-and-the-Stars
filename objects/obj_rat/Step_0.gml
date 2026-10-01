@@ -1,4 +1,7 @@
-/// @description Rat movement
+if global.paused
+{
+    exit;
+}
 
 // Gravity
 vsp += 0.5;
@@ -7,18 +10,13 @@ if vsp > 10 {
     vsp = 10;
 }
 
-
-// -------------------------------------------------
 // CHECK FOR WALL / SPIKE
-// -------------------------------------------------
 
 var wall_ahead = place_meeting(x + hsp, y, obj_ground)
               || place_meeting(x + hsp, y, obj_spike);
 
 
-// -------------------------------------------------
 // CHECK FOR LEDGE
-// -------------------------------------------------
 
 var ledge_ahead = !place_meeting(
     x + (sprite_width * sign(hsp)),
@@ -27,18 +25,14 @@ var ledge_ahead = !place_meeting(
 );
 
 
-// -------------------------------------------------
 // TURN AROUND
-// -------------------------------------------------
 
 if wall_ahead || ledge_ahead {
     hsp = -hsp;
 }
 
-
-// -------------------------------------------------
 // HORIZONTAL COLLISION WITH GROUND
-// -------------------------------------------------
+
 
 if place_meeting(x + hsp, y, obj_ground) {
 
@@ -55,10 +49,7 @@ if place_meeting(x + hsp, y, obj_ground) {
 
 x += hsp;
 
-
-// -------------------------------------------------
 // VERTICAL COLLISION
-// -------------------------------------------------
 
 if place_meeting(x, y + vsp, obj_ground) {
 
@@ -75,10 +66,7 @@ if place_meeting(x, y + vsp, obj_ground) {
 
 y += vsp;
 
-
-// -------------------------------------------------
 // RAT ANIMATION
-// -------------------------------------------------
 
 if hsp > 0 {
     image_index = 0; // Facing right

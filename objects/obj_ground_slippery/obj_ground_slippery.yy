@@ -1,9 +1,9 @@
 {
   "$GMObject":"",
-  "%Name":"obj_flower_platform",
+  "%Name":"obj_ground_slippery",
   "eventList":[],
   "managed":true,
-  "name":"obj_flower_platform",
+  "name":"obj_ground_slippery",
   "overriddenProperties":[],
   "parent":{
     "name":"Objects",
@@ -31,8 +31,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_flower_platform",
-    "path":"sprites/spr_flower_platform/spr_flower_platform.yy",
+    "name":"spr_ground_slippery",
+    "path":"sprites/spr_ground_slippery/spr_ground_slippery.yy",
   },
   "spriteMaskId":null,
   "visible":true,
