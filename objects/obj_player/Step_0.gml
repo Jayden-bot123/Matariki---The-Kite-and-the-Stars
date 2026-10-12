@@ -118,7 +118,7 @@ if global.paused
 
 if dying
 {
-    // Player has already landed
+    // Player has already landed or fallen out of the level
     if death_on_ground && !gameover_selected
     {
         hsp = 0;
@@ -211,7 +211,7 @@ if dying
 }
 
 
-// If frozen stop all movement
+// IF FROZEN STOP ALL MOVEMENT
 
 if frozen
 {
@@ -234,6 +234,7 @@ else
     key_jump = 0;
 }
 
+
 // APPLY KNOCKBACK
 
 if knockback_timer > 0
@@ -244,6 +245,16 @@ if knockback_timer > 0
 else
 {
     var move = key_right - key_left;
+	
+	// WIND EFFECT
+
+	if room == rm_level5
+	{
+	    if !on_ground
+	    {
+	        hsp += global.wind_force * 0.1;
+	    }
+	}
 
     // Check ONLY for slippery ground
     var on_slippery = place_meeting(
@@ -256,8 +267,8 @@ else
     {
         // OILED / VERY SLIPPERY GROUND
 
-        var slippery_acceleration = 0.35;
-        var slippery_friction = 0.985;
+        var slippery_acceleration = 0.25;
+        var slippery_friction = 0.98;
 
         // Accelerate towards the direction being pressed
         if move != 0
@@ -273,7 +284,7 @@ else
             hsp *= slippery_friction;
 
             // Stop tiny leftover movement
-            if abs(hsp) < 0.05
+            if abs(hsp) < 0.07
             {
                 hsp = 0;
             }
@@ -281,12 +292,26 @@ else
     }
     else
     {
-        // ORIGINAL MOVEMENT
         // This handles ALL normal ground and ALL airborne movement.
 
         hsp = move * walksp;
+		// WIND EFFECT
+
+		if room == rm_level5
+		{
+		    if !on_ground
+		    {
+		        hsp += global.wind_force * 0.18;
+		    }
+		}
     }
 }
+
+
+// REMEMBER IF PLAYER WAS AIRBORNE
+
+var was_airborne = !on_ground;
+
 
 // GRAVITY
 
@@ -298,6 +323,41 @@ else
 {
     vsp += grv;
     setOnGround(false);
+}
+
+
+// FALL OUT OF LEVEL WHILE ALIVE
+
+if !dying && y > room_height + 32
+{
+    hp = 0;
+
+    dying = true;
+    death_on_ground = true;
+
+    hascontrol = false;
+    frozen = false;
+
+    invincible = false;
+    inv_timer = 0;
+    flash_timer = 0;
+    image_alpha = 1;
+
+    hsp = 0;
+    vsp = 0;
+
+    if face == 1
+    {
+        death_frame = 0;
+    }
+    else
+    {
+        death_frame = 1;
+    }
+
+    sprite_index = spr_player_death;
+    image_speed = 0;
+    image_index = death_frame;
 }
 
 
@@ -328,24 +388,18 @@ if jump_key_buffered && jump_count < jump_max
     jump_count++;
     jump_hold_timer = jump_hold_frames;
 
-    // Remember whether the player was moving when
-    // they jumped from slippery ground.
-    if place_meeting(x, y + 1, obj_ground_slippery)
-    {
-        slip_jump_active = true;
+    // Remember whether the player was moving when they jumped.
+    // This also works if they jump from normal ground
+    // and land on slippery ground later.
 
-        if abs(hsp) > 0.1
-        {
-            slip_jump_moving = true;
-        }
-        else
-        {
-            slip_jump_moving = false;
-        }
+    slip_jump_active = true;
+
+    if abs(hsp) > 0.1
+    {
+        slip_jump_moving = true;
     }
     else
     {
-        slip_jump_active = false;
         slip_jump_moving = false;
     }
 
@@ -510,7 +564,7 @@ if !oneway_landed &&
 }
 
 
-// Move vertically if we didn't land on a one-way platform
+// MOVE VERTICALLY IF WE DIDN'T LAND ON A ONE-WAY PLATFORM
 
 if !oneway_landed
 {
@@ -557,7 +611,7 @@ if standing_on_oneway ||
        vsp >= 0 &&
        (
            place_meeting(x, y + 1, obj_ground) ||
-           (invincible && place_meeting(x, y + 1, obj_water))
+           ((invincible || dying) && place_meeting(x, y + 1, obj_water))
        )
    )
 {
@@ -576,22 +630,38 @@ if standing_on_oneway ||
     }
 }
 
+
+// FALL OUT OF LEVEL WHILE DYING
+
+if dying && !death_on_ground && y > room_height + 32
+{
+    death_on_ground = true;
+
+    hsp = 0;
+    vsp = 0;
+
+    sprite_index = spr_player_death;
+    image_speed = 0;
+    image_index = death_frame;
+}
+
+
 // SLIPPERY LANDING
 
-if slip_jump_active &&
+if was_airborne &&
    standing_on_oneway == false &&
    place_meeting(x, y + 1, obj_ground_slippery)
 {
-    // Small slide if the player jumped while stationary
-    // Medium slide if the player jumped while moving
-
-    if slip_jump_moving
+    // If the player was already moving, give them a stronger slide
+    if abs(hsp) > 0.1
     {
-        hsp = face * 1.5;
+        hsp = sign(hsp) * 1.5;
     }
     else
     {
-        hsp = face * 0.7;
+        // If they walked/fell off with little momentum,
+        // slide in the direction they are facing
+        hsp = face * 0.9;
     }
 
     slip_jump_active = false;
