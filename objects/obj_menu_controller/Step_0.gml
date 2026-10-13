@@ -68,13 +68,23 @@ if (menu_control && button_delay == 0)
     }
 }
 
-if (menu_x > gui_width + 150) && (menu_committed != -1)
+if (menu_x > gui_width + 150 && menu_committed != -1)
 {
-	switch (menu_committed)
-	{
-		case 2: default: scr_slide_transition(TRANS_MODE.NEXT); break;
-		case 1: scr_slide_transition(TRANS_MODE.GOTO, rm_instructions); break;
-		case 0: game_end(); break; 
-	}
-	
+    switch (menu_committed)
+    {
+        case 2: default:
+            // Reset the opening cutscene for a new game
+            global.intro_phase = 0;
+
+            scr_slide_transition(TRANS_MODE.NEXT);
+            break;
+
+        case 1:
+            scr_slide_transition(TRANS_MODE.GOTO, rm_instructions);
+            break;
+
+        case 0:
+            game_end();
+            break;
+    }
 }

@@ -1,6 +1,3 @@
-
-/// @description Damage player and knock them away from bird
-
 if (active && !other.invincible)
 {
     // Remember the direction the bird is travelling
