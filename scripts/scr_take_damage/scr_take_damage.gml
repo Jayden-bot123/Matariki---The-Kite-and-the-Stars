@@ -10,6 +10,9 @@ function take_damage(_knockback_dir = 0)
     if !invincible
     {
         hp -= 1;
+		
+		// PLAY DAMAGE SOUND
+		audio_play_sound(snd_player_damage, 1, false);
 
         // PLAYER HAS DIED
 

@@ -19,6 +19,13 @@ if !dying
             // Stop player movement
             hsp = 0;
             vsp = 0;
+			
+			// STOP WALKING SOUND WHILE PAUSED
+			if walk_sound_instance != -1
+			{
+			    audio_stop_sound(walk_sound_instance);
+			    walk_sound_instance = -1;
+			}
         }
     }
 }
@@ -56,59 +63,144 @@ if global.paused
         }
     }
 
-    // PAUSE MENU CONTROLS
 
-    if pause_button_alpha >= 1
-    {
-        if keyboard_check_pressed(vk_up)
-        {
-            pause_cursor--;
+// PAUSE MENU CONTROLS — KEYBOARD AND MOUSE
 
-            if pause_cursor < 0
-            {
-                pause_cursor = 2;
-            }
-        }
+	if (pause_button_alpha >= 1)
+	{
+	    var gui_w = display_get_gui_width();
+	    var gui_h = display_get_gui_height();
 
-        if keyboard_check_pressed(vk_down)
-        {
-            pause_cursor++;
+	    var button_x = gui_w / 2;
 
-            if pause_cursor > 2
-            {
-                pause_cursor = 0;
-            }
-        }
+	    var resume_y = 145;
+	    var restart_y = 180;
+	    var menu_y = 215;
 
-        if keyboard_check_pressed(vk_enter)
-        {
-            pause_selected = true;
+	    var mx = device_mouse_x_to_gui(0);
+	    var my = device_mouse_y_to_gui(0);
 
-            switch (pause_cursor)
-            {
-                // RESUME
-                case 0:
-                {
-                    global.paused = false;
-                    break;
-                }
+	    // MOUSE HOVER
+	    if (mx >= button_x - 110 && mx <= button_x + 110)
+	    {
+	        if (my >= resume_y - 15 && my <= resume_y + 15)
+	        {
+	            pause_cursor = 0;
+	        }
+	        else if (my >= restart_y - 15 && my <= restart_y + 15)
+	        {
+	            pause_cursor = 1;
+	        }
+	        else if (my >= menu_y - 15 && my <= menu_y + 15)
+	        {
+	            pause_cursor = 2;
+	        }
+	    }
+		// PAUSE MENU HOVER SOUND
+		if (pause_cursor != pause_previous_cursor)
+		{
+		    audio_play_sound(snd_button_hover, 1, false);
+		    pause_previous_cursor = pause_cursor;
+		}
 
-                // RESTART
-                case 1:
-                {
-                    scr_slide_transition(TRANS_MODE.RESTART);
-                    break;
-                }
+	    // MOUSE CLICK
+	    if (mouse_check_button_pressed(mb_left))
+	    {
+	        var clicked_button = -1;
 
-                // MAIN MENU
-                case 2:
-                {
-                    scr_slide_transition(TRANS_MODE.GOTO, rm_main_menu);
-                    break;
-                }
-            }
-        }
-    }
+	        if (mx >= button_x - 110 && mx <= button_x + 110)
+	        {
+	            if (my >= resume_y - 15 && my <= resume_y + 15)
+	            {
+	                clicked_button = 0;
+	            }
+	            else if (my >= restart_y - 15 && my <= restart_y + 15)
+	            {
+	                clicked_button = 1;
+	            }
+	            else if (my >= menu_y - 15 && my <= menu_y + 15)
+	            {
+	                clicked_button = 2;
+	            }
+	        }
+
+	        if (clicked_button != -1)
+	        {
+	            pause_cursor = clicked_button;
+	            pause_selected = true;
+				audio_play_sound(snd_button_click, 1, false);
+
+	            switch (pause_cursor)
+	            {
+	                case 0:
+	                    // RESUME
+	                    global.paused = false;
+	                    break;
+
+	                case 1:
+	                    // RESTART
+	                    scr_slide_transition(TRANS_MODE.RESTART);
+	                    break;
+
+	                case 2:
+	                    // MAIN MENU
+	                    scr_slide_transition(
+	                        TRANS_MODE.GOTO,
+	                        rm_main_menu
+	                    );
+	                    break;
+	            }
+	        }
+	    }
+
+	    // KEYBOARD NAVIGATION
+	    if (keyboard_check_pressed(vk_up))
+	    {
+	        pause_cursor--;
+
+	        if (pause_cursor < 0)
+	        {
+	            pause_cursor = 2;
+	        }
+	    }
+
+	    if (keyboard_check_pressed(vk_down))
+	    {
+	        pause_cursor++;
+
+	        if (pause_cursor > 2)
+	        {
+	            pause_cursor = 0;
+	        }
+	    }
+
+	    // KEYBOARD CONFIRM
+	    if (keyboard_check_pressed(vk_enter) ||
+	        keyboard_check_pressed(vk_space))
+	    {
+	        pause_selected = true;
+			audio_play_sound(snd_button_click, 1, false);
+
+	        switch (pause_cursor)
+	        {
+	            case 0:
+	                global.paused = false;
+	                break;
+
+	            case 1:
+	                scr_slide_transition(TRANS_MODE.RESTART);
+	                break;
+
+	            case 2:
+	                scr_slide_transition(
+	                    TRANS_MODE.GOTO,
+	                    rm_main_menu
+	                );
+	                break;
+	        }
+	    }
+	}
+
 
     exit;
 }
@@ -118,6 +210,13 @@ if global.paused
 
 if dying
 {
+	// Play game-over sound only once per death
+    if (!gameover_sound_played)
+    {
+        audio_play_sound(snd_game_over, 1, false);
+        gameover_sound_played = true;
+    }
+	
     // Player has already landed or fallen out of the level
     if death_on_ground && !gameover_selected
     {
@@ -154,56 +253,143 @@ if dying
             }
         }
 
-        // GAME OVER keyboard controls
+        
+// GAME OVER CONTROLS — KEYBOARD AND MOUSE
 
-        if gameover_control
-        {
-            if keyboard_check_pressed(vk_up)
-            {
-                gameover_cursor--;
+	if (gameover_control)
+	{
+	    var gui_w = display_get_gui_width();
 
-                if gameover_cursor < 0
-                {
-                    gameover_cursor = 2;
-                }
-            }
+	    var button_x = gui_w / 2;
 
-            if keyboard_check_pressed(vk_down)
-            {
-                gameover_cursor++;
+	    var restart_y = 145;
+	    var menu_y = 180;
+	    var quit_y = 215;
 
-                if gameover_cursor > 2
-                {
-                    gameover_cursor = 0;
-                }
-            }
+	    var mx = device_mouse_x_to_gui(0);
+	    var my = device_mouse_y_to_gui(0);
 
-            if keyboard_check_pressed(vk_enter)
-            {
-                gameover_selected = true;
+	    // MOUSE HOVER
+	    if (mx >= button_x - 110 && mx <= button_x + 110)
+	    {
+	        if (my >= restart_y - 15 && my <= restart_y + 15)
+	        {
+	            gameover_cursor = 0;
+	        }
+	        else if (my >= menu_y - 15 && my <= menu_y + 15)
+	        {
+	            gameover_cursor = 1;
+	        }
+	        else if (my >= quit_y - 15 && my <= quit_y + 15)
+	        {
+	            gameover_cursor = 2;
+	        }
+	    }
+		// GAME OVER HOVER SOUND
+		if (gameover_cursor != gameover_previous_cursor)
+		{
+		    audio_play_sound(snd_button_hover, 1, false);
+		    gameover_previous_cursor = gameover_cursor;
+		}
 
-                switch (gameover_cursor)
-                {
-                    case 0:
-                    {
-                        scr_slide_transition(TRANS_MODE.RESTART);
-                        break;
-                    }
+	    // MOUSE CLICK
+	    if (mouse_check_button_pressed(mb_left))
+	    {
+	        var clicked_button = -1;
 
-                    case 1:
-                    {
-                        scr_slide_transition(TRANS_MODE.GOTO, rm_main_menu);
-                        break;
-                    }
+	        if (mx >= button_x - 110 && mx <= button_x + 110)
+	        {
+	            if (my >= restart_y - 15 && my <= restart_y + 15)
+	            {
+	                clicked_button = 0;
+	            }
+	            else if (my >= menu_y - 15 && my <= menu_y + 15)
+	            {
+	                clicked_button = 1;
+	            }
+	            else if (my >= quit_y - 15 && my <= quit_y + 15)
+	            {
+	                clicked_button = 2;
+	            }
+	        }
 
-                    case 2:
-                    {
-                        game_end();
-                        break;
-                    }
-                }
-            }
-        }
+	        if (clicked_button != -1)
+	        {
+	            gameover_cursor = clicked_button;
+	            gameover_selected = true;
+				audio_play_sound(snd_button_click, 1, false);
+
+	            switch (gameover_cursor)
+	            {
+	                case 0:
+	                    // RESTART
+	                    scr_slide_transition(TRANS_MODE.RESTART);
+	                    break;
+
+	                case 1:
+	                    // MAIN MENU
+	                    scr_slide_transition(
+	                        TRANS_MODE.GOTO,
+	                        rm_main_menu
+	                    );
+	                    break;
+
+	                case 2:
+	                    // QUIT
+	                    game_end();
+	                    break;
+	            }
+	        }
+	    }
+
+	    // KEYBOARD NAVIGATION
+	    if (keyboard_check_pressed(vk_up))
+	    {
+	        gameover_cursor--;
+
+	        if (gameover_cursor < 0)
+	        {
+	            gameover_cursor = 2;
+	        }
+	    }
+
+	    if (keyboard_check_pressed(vk_down))
+	    {
+	        gameover_cursor++;
+
+	        if (gameover_cursor > 2)
+	        {
+	            gameover_cursor = 0;
+	        }
+	    }
+
+	    // KEYBOARD CONFIRM
+	    if (keyboard_check_pressed(vk_enter) ||
+	        keyboard_check_pressed(vk_space))
+	    {
+	        gameover_selected = true;
+			audio_play_sound(snd_button_click, 1, false);
+
+	        switch (gameover_cursor)
+	        {
+	            case 0:
+	                scr_slide_transition(TRANS_MODE.RESTART);
+	                break;
+
+	            case 1:
+	                scr_slide_transition(
+	                    TRANS_MODE.GOTO,
+	                    rm_main_menu
+	                );
+	                break;
+
+	            case 2:
+	                game_end();
+	                break;
+	        }
+	    }
+	}
+
 
         // Don't run normal player movement
         exit;
@@ -387,6 +573,8 @@ if jump_key_buffered && jump_count < jump_max
     jump_key_buffer_timer = 0;
     jump_count++;
     jump_hold_timer = jump_hold_frames;
+	// PLAY JUMP SOUND
+	audio_play_sound(snd_player_jump, 1, false);
 
     // Remember whether the player was moving when they jumped.
     // This also works if they jump from normal ground
@@ -617,17 +805,29 @@ if standing_on_oneway ||
 {
     setOnGround(true);
 
-    if dying && !death_on_ground
-    {
-        death_on_ground = true;
+	if dying && !death_on_ground
+	{
+	    death_on_ground = true;
 
-        hsp = 0;
-        vsp = 0;
+	    hsp = 0;
+	    vsp = 0;
 
-        sprite_index = spr_player_death;
-        image_speed = 0;
-        image_index = death_frame;
-    }
+	    sprite_index = spr_player_death;
+	    image_speed = 0;
+	    image_index = death_frame;
+	}
+	// PLAY LANDING SOUND WHEN LANDING ALIVE
+	if was_airborne &&
+	   !dying &&
+	   (
+	       standing_on_oneway ||
+	       place_meeting(x, y + 1, obj_ground) ||
+	       ((invincible || dying) &&
+	        place_meeting(x, y + 1, obj_water))
+	   )
+	{
+	    audio_play_sound(snd_player_land, 1, false);
+	}
 }
 
 
@@ -668,6 +868,29 @@ if was_airborne &&
     slip_jump_moving = false;
 }
 
+// WALKING SOUND TIMER
+var should_play_walk =
+    !global.paused &&
+    !dying &&
+    !frozen &&
+    on_ground &&
+    abs(hsp) > 0.1;
+
+if (should_play_walk)
+{
+    walk_sound_timer--;
+
+    if (walk_sound_timer <= 0)
+    {
+        audio_play_sound(snd_player_walk, 1, false);
+        walk_sound_timer = walk_sound_interval;
+    }
+}
+else
+{
+    // Reset timer when not walking
+    walk_sound_timer = 0;
+}
 
 // SPRITE CONTROL
 

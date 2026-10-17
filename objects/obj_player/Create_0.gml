@@ -103,3 +103,15 @@ pause_selected = false;
 slip_jump_active = false;
 slip_jump_moving = false;
 
+// AUDIO
+walk_sound_instance = -1;
+
+// WALKING SOUND TIMER
+walk_sound_timer = 0;
+walk_sound_interval = 12; // 0.2 seconds at 60 FPS
+
+pause_previous_cursor = -1;
+gameover_previous_cursor = -1;
+
+// Game-over sound tracking
+gameover_sound_played = false;
